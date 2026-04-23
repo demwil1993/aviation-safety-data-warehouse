@@ -1,0 +1,32 @@
+# Virtual environments
+myenv/
+
+# macOS temp / backup files
+.$*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment / secrets
+.env
+*.env
+
+# Data engineering outputs (large/raw/generated data)
+*.csv
+*.parquet
+*.avro
+*.json
+
+# Keep reference/config data
+!data/ref_*.csv
+!data/incident_*.csv
+!data/ref_*.json
+
+# VS Code
+.vscode/
+
+# OS files
+Thumbs.db
+.DS_Store
