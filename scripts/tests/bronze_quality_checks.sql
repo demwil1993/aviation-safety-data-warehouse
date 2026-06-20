@@ -32,9 +32,6 @@ Usage:
     - Use results to trace data quality issues back to source systems
     - Not intended to block pipeline execution
 
-Author:
-    Data Engineering Intern Project
-
 ===================================================================================
 */
 
