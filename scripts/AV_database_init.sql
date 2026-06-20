@@ -27,5 +27,5 @@ IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'silver')     EXEC('CREATE
 IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'platinum')   EXEC('CREATE SCHEMA platinum');
 IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'gold')       EXEC('CREATE SCHEMA gold');
 IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'config')     EXEC('CREATE SCHEMA config');
-IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'etl')     EXEC('CREATE SCHEMA etl');
+IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'etl')        EXEC('CREATE SCHEMA etl');
 GO
