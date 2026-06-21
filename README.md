@@ -1,6 +1,6 @@
 # Aviation Safety Data Warehouse
 
-End-to-end ETL pipeline for an aviation safety data warehouse built on SQL Server. The solution uses layered modeling (Bronze → Silver → Gold → Platinum) with SQL-based transformations and Python-based orchestration, producing business-ready gold views for analysis.
+End-to-end ETL pipeline for an aviation safety data warehouse built on SQL Server. The solution uses layered modeling (Bronze → Silver → Platinum → Gold) with SQL-based transformations and Python-based orchestration, producing business-ready gold views for analysis.
 
 ---
 
