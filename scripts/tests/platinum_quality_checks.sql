@@ -1,6 +1,3 @@
-USE AviationSafetyDWH;
-GO
-
 /*
 ===============================================================================
 Quality Checks
@@ -18,26 +15,119 @@ Usage Notes:
 */
 
 -- ====================================================================
--- Checking 'platinum.DimAircraft'
+-- Checking Dimension Tables
 -- ====================================================================
--- Check for Uniqueness of Aircraft Key in platinum.DimAircraft
+-- Check for Uniqueness of Primary Key in dimension tables
 -- Expectation: No results 
 
+USE AviationSafetyDWH;
+GO
+
 SELECT
-    da.AircraftKey,
-    COUNT(*) duplicates
-FROM platinum.DimAircraft da
+    'platinum.DimAircraft' AS TableName,
+    CAST(da.AircraftKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicatesOrNull
+FROM platinum.DimAircraft AS da
 GROUP BY da.AircraftKey
-HAVING COUNT(*) > 1;
+HAVING COUNT(*) > 1 OR da.AircraftKey IS NULL
 
--- ====================================================================
--- Checking 'platinum.DimAircraftLevelKey'
--- ====================================================================
--- Check for Uniqueness of Aircraft Damage Level Key in platinum.DimAircraftLevelKey
--- Expectation: No results 
+UNION ALL
+
 SELECT
-    dl.AircraftDamageLevelKey,
-    COUNT(*) duplicates
-FROM platinum.DimAircraftDamageLevel dl
+    'platinum.DimAircraftDamageLevel' AS TableName,
+    CAST(dl.AircraftDamageLevelKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicatesOrNull
+FROM platinum.DimAircraftDamageLevel AS dl
 GROUP BY dl.AircraftDamageLevelKey
-HAVING COUNT(*) > 1;
+HAVING COUNT(*) > 1 OR dl.AircraftDamageLevelKey IS NULL
+
+UNION ALL
+
+SELECT
+    'platinum.DimAirport' AS TableName,
+    CAST(dp.AirportKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicatesOrNull
+FROM platinum.DimAirport AS dp
+GROUP BY dp.AirportKey
+HAVING COUNT(*) > 1 OR dp.AirportKey IS NULL
+
+UNION ALL
+
+SELECT
+    'platinum.DimDate' AS TableName,
+    CAST(dd.DateKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicatesOrNull
+FROM platinum.DimDate AS dd
+GROUP BY dd.DateKey
+HAVING COUNT(*) > 1 OR dd.DateKey IS NULL
+
+UNION ALL
+
+SELECT
+    'platinum.DimEventType' AS TableName,
+    CAST(de.EventTypeKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicatesOrNull
+FROM platinum.DimEventType AS de
+GROUP BY de.EventTypeKey
+HAVING COUNT(*) > 1 OR de.EventTypeKey IS NULL
+
+UNION ALL
+
+SELECT
+    'platinum.DimInvestigationStatus' AS TableName,
+    CAST(dis.InvestigationStatusKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicatesOrNull
+FROM platinum.DimInvestigationStatus AS dis
+GROUP BY dis.InvestigationStatusKey
+HAVING COUNT(*) > 1 OR dis.InvestigationStatusKey IS NULL
+
+UNION ALL
+
+SELECT
+    'platinum.DimOperator' AS TableName,
+    CAST(do.OperatorKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicatesOrNull
+FROM platinum.DimOperator AS do
+GROUP BY do.OperatorKey
+HAVING COUNT(*) > 1 OR do.OperatorKey IS NULL
+
+UNION ALL
+
+SELECT
+    'platinum.DimPhaseOfFlight' AS TableName,
+    CAST(dpf.PhaseOfFlightKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicateOrNull
+FROM platinum.DimPhaseOfFlight AS dpf
+GROUP BY dpf.PhaseOfFlightKey
+HAVING COUNT(*) > 1 OR dpf.PhaseOfFlightKey IS NULL
+
+UNION ALL
+
+SELECT
+    'platinum.DimReportedBy' AS TableName,
+    CAST(drb.ReportedByKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicatesOrNull
+FROM platinum.DimReportedBy drb
+GROUP BY drb.ReportedByKey
+HAVING COUNT(*) > 1 OR drb.ReportedByKey IS NULL
+
+UNION ALL
+
+SELECT
+    'platinum.DimSeverity' AS TableName,
+    CAST(ds.SeverityKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicateOrNull
+FROM platinum.DimSeverity AS ds
+GROUP BY ds.SeverityKey
+HAVING COUNT(*) > 1 OR ds.SeverityKey IS NULL
+
+UNION ALL
+
+SELECT
+    'platinum.DimWeatherCondition' AS TableName,
+    CAST(dwc.WeatherConditionKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(*) AS DuplicateOrNull
+FROM platinum.DimWeatherCondition AS dwc
+GROUP BY dwc.WeatherConditionKey
+HAVING COUNT(*) > 1 OR dwc.WeatherConditionKey IS NULL;
+GO
