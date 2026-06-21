@@ -3,6 +3,7 @@ myenv/
 
 # macOS temp / backup files
 .$*
+*.bkp
 
 # Python cache
 __pycache__/
