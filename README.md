@@ -26,10 +26,10 @@ Source Data
  Silver Layer
     │
     ▼
- Gold Layer
+ Platinum Layer
     │
     ▼
- Platinum Layer
+ Gold Layer
 ```
 
 ### Bronze Layer
@@ -43,12 +43,12 @@ Source Data
 - Business rule enforcement
 - Referential integrity preparation
 
-### Gold Layer
+### Platinum Layer
 - Dimensional modeling
 - Fact and dimension tables
 - Analytical data structures
 
-### Platinum Layer
+### Gold Layer
 - Business-ready datasets
 - Data quality validation
 - Executive and reporting consumption layer
