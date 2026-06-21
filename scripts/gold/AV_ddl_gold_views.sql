@@ -4,8 +4,6 @@ DDL Script: Create Gold Layer Views (Aviation Safety DWH)
 ===============================================================================
 Notes
 - Gold layer is business-ready views built from the Platinum layer
-- Updated to PascalCase to align with Platinum table and column names
-- Duplicate Aircraft risk view definition removed
 ===============================================================================
 */
 
