@@ -2,7 +2,7 @@ USE AviationSafetyDWH;
 GO
 
 /* =========================================================
-   15) EXAMPLE QUERIES
+   Pipeline Logging Checks
    ========================================================= */
 
 -- Most recent runs
