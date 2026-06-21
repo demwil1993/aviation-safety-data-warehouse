@@ -46,6 +46,9 @@ Columns:
 ===================================================================================
 */
 
+USE AviationSafetyDWH;
+GO
+
 CREATE OR ALTER PROCEDURE bronze.DataQualityCheck AS
 BEGIN
     SET NOCOUNT ON;

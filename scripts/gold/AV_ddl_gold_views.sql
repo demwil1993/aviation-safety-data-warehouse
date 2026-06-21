@@ -9,6 +9,9 @@ Notes
 ===============================================================================
 */
 
+USE AviationSafetyDWH;
+GO
+
 CREATE OR ALTER VIEW gold.VW_IncidentDetail AS
 SELECT
     /* ---------------------------

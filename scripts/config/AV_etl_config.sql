@@ -8,6 +8,9 @@ Purpose:
 ===============================================================================
 */
 
+USE AviationSafetyDWH;
+GO
+
 IF OBJECT_ID('config.EtlConfig', 'U') IS NULL
 BEGIN
     CREATE TABLE config.EtlConfig (

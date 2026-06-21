@@ -18,6 +18,10 @@ Usage Example:
     EXEC bronze.LoadBronze;
 ===============================================================================
 */
+
+USE AviationSafetyDWH;
+GO
+
 CREATE OR ALTER PROCEDURE bronze.LoadBronze AS
 BEGIN
     SET NOCOUNT ON;

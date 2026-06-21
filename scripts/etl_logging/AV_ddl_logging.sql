@@ -4,6 +4,9 @@
    Purpose : Centralized logging for ETL pipeline runs
    ========================================================= */
 
+USE AviationSafetyDWH;
+GO   
+
 SET NOCOUNT ON;
 GO
 

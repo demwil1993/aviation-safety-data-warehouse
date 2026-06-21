@@ -19,6 +19,10 @@ Usage Example:
     EXEC platinum.LoadPlatinum;
 ===============================================================================
 */
+
+USE AviationSafetyDWH;
+GO
+
 CREATE OR ALTER PROCEDURE platinum.LoadPlatinum
 AS
 BEGIN

@@ -17,6 +17,10 @@ Usage Example:
     EXEC silver.LoadSilver;
 ===============================================================================
 */
+
+USE AviationSafetyDWH;
+GO
+
 CREATE OR ALTER PROCEDURE silver.LoadSilver
 AS
 BEGIN
