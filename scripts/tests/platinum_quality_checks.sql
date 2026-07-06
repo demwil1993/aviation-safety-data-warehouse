@@ -142,3 +142,141 @@ FROM platinum.DimWeatherCondition AS dwc
 GROUP BY dwc.WeatherConditionKey
 HAVING COUNT(*) > 1 OR dwc.WeatherConditionKey IS NULL;
 GO
+
+-- ====================================================================
+-- Checking Referential integrity
+-- ====================================================================
+-- Check for referential integrity between fact and dimension tables.
+-- Expectation: No results 
+SELECT
+    'AircraftKey' AS ForeignKey,
+    CAST(f.AircraftKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimAircraft AS da
+    ON da.AircraftKey = f.AircraftKey
+WHERE da.AircraftKey IS NULL
+GROUP BY f.AircraftKey
+
+UNION ALL
+
+SELECT
+    'AircraftDamageLevelKey' AS ForeignKey,
+    CAST(f.AircraftDamageLevelKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimAircraftDamageLevel AS dl
+    ON dl.AircraftDamageLevelKey = f.AircraftDamageLevelKey
+WHERE dl.AircraftDamageLevelKey IS NULL
+GROUP BY f.AircraftDamageLevelKey
+
+UNION ALL
+
+SELECT
+    'AirportKey' AS ForeignKey,
+    CAST(f.AirportKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimAirport AS dai
+    ON dai.AirportKey = f.AirportKey
+WHERE dai.AirportKey IS NULL
+GROUP BY f.AirportKey
+
+UNION ALL
+
+SELECT
+    'DateKey' AS ForeignKey,
+    CAST(f.DateKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimDate AS dd
+    ON dd.DateKey = f.DateKey
+WHERE dd.DateKey IS NULL
+GROUP BY f.DateKey
+
+UNION ALL
+
+SELECT
+    'EventTypeKey' AS ForeignKey,
+    CAST(f.EventTypeKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimEventType AS det
+    ON det.EventTypeKey = f.EventTypeKey
+WHERE det.EventTypeKey IS NULL
+GROUP BY f.EventTypeKey
+
+UNION ALL
+
+SELECT
+    'InvestigationStatusKey' AS ForeignKey,
+    CAST(f.InvestigationStatusKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimInvestigationStatus AS dis
+    ON dis.InvestigationStatusKey = f.InvestigationStatusKey
+WHERE dis.InvestigationStatusKey IS NULL
+GROUP BY f.InvestigationStatusKey
+
+UNION ALL
+
+SELECT
+    'OperatorKey' AS ForeignKey,
+    CAST(f.OperatorKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimOperator AS do
+    ON do.OperatorKey = f.OperatorKey
+WHERE do.OperatorKey IS NULL
+GROUP BY f.OperatorKey
+
+UNION ALL
+
+SELECT
+    'PhaseOfFlightKey' AS ForeignKey,
+    CAST(f.PhaseOfFlightKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimPhaseOfFlight AS dpf
+    ON dpf.PhaseOfFlightKey = f.PhaseOfFlightKey
+WHERE dpf.PhaseOfFlightKey IS NULL
+GROUP BY f.PhaseOfFlightKey
+
+UNION ALL
+
+SELECT
+    'ReportedByKey' AS ForeignKey,
+    CAST(f.ReportedByKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimReportedBy AS drb
+    ON drb.ReportedByKey = f.ReportedByKey
+WHERE drb.ReportedByKey IS NULL
+GROUP BY f.ReportedByKey
+
+UNION ALL
+
+SELECT
+    'SeverityKey' AS ForeignKey,
+    CAST(f.SeverityKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimSeverity AS ds
+    ON ds.SeverityKey = f.SeverityKey
+WHERE ds.SeverityKey IS NULL
+GROUP BY f.SeverityKey
+
+UNION ALL
+
+SELECT
+    'WeatherConditionKey' AS ForeignKey,
+    CAST(f.WeatherConditionKey AS NVARCHAR(50)) AS KeyValue,
+    COUNT(f.IncidentId) AS OrphanedRows
+FROM platinum.FactIncidents AS f
+LEFT JOIN platinum.DimWeatherCondition AS dwc
+    ON dwc.WeatherConditionKey = f.WeatherConditionKey
+WHERE dwc.WeatherConditionKey IS NULL
+GROUP BY f.WeatherConditionKey
+
+ORDER BY ForeignKey, KeyValue;
+GO
