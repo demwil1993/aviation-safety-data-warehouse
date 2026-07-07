@@ -1,6 +1,3 @@
-USE AviationSafetyDWH;
-GO
-
 /*
 ===============================================================================
 Quality Checks
@@ -20,23 +17,69 @@ Usage Notes:
 ===============================================================================
 */
 
--- ====================================================================
--- Checking 'silver.IncidentReports'
--- ====================================================================
--- Check for NULLs or Duplicates in Primary Key
--- Expectation: No Results
+USE AviationSafetyDWH;
+GO
 
 SELECT servicename, service_account
 FROM sys.dm_server_services;
 GO
+-- ====================================================================
+-- Checking Silver layer tables PRIMARY KEYs
+-- ====================================================================
+-- Check for NULLs or Duplicates in Primary Key
+-- Expectation: No Results
 
-SELECT
-    ir.IncidentId,
-    COUNT(*)
-FROM silver.IncidentReports ir
-GROUP BY ir.IncidentId
-HAVING COUNT(*) > 1 OR ir.IncidentId IS NULL;
+WITH PrimaryKeyChecks AS (
+    SELECT
+        'silver.IncidentReports' AS TableName,
+        'IncidentId' AS ColumnName,
+        CAST(ir.IncidentId AS NVARCHAR(100)) AS KeyValue,
+        COUNT(*) AS DuplicatesOrNull
+    FROM silver.IncidentReports AS ir
+    GROUP BY ir.IncidentId
+    HAVING COUNT(*) > 1 OR ir.IncidentId IS NULL
 
+    UNION ALL
+
+    SELECT
+        'silver.RefAircraft',
+        'AircraftRegistration',
+        CAST(a.AircraftRegistration AS NVARCHAR(100)),
+        COUNT(*)
+    FROM silver.RefAircraft AS a
+    GROUP BY a.AircraftRegistration
+    HAVING COUNT(*) > 1 OR a.AircraftRegistration IS NULL
+
+    UNION ALL
+
+    SELECT
+        'silver.RefAirport',
+        'AirportCode',
+        CAST(a.AirportCode AS NVARCHAR(100)),
+        COUNT(*)
+    FROM silver.RefAirport AS a
+    GROUP BY a.AirportCode
+    HAVING COUNT(*) > 1 OR a.AirportCode IS NULL
+
+    UNION ALL
+
+    SELECT
+        'silver.RefOperator',
+        'OperatorCode',
+        CAST(o.OperatorCode AS NVARCHAR(100)),
+        COUNT(*)
+    FROM silver.RefOperator AS o
+    GROUP BY o.OperatorCode
+    HAVING COUNT(*) > 1 OR o.OperatorCode IS NULL
+)
+SELECT *
+FROM PrimaryKeyChecks
+ORDER BY TableName, KeyValue;
+GO
+
+-- ====================================================================
+-- Checking 'silver.IncidentReports'
+-- ====================================================================
 -- Check for unwanted spaces
 -- Expectation: No results
 SELECT
@@ -62,191 +105,246 @@ SELECT
 FROM silver.IncidentReports ir
 WHERE ir.FatalitiesCount < 0 OR ir.FatalitiesCount IS NULL;
 GO
+
 -- ====================================================================
 -- Checking 'silver.RefAircraft'
 -- ====================================================================
--- Check for NULLs or Duplicates in Primary Key
--- Expectation: No Results
-
-SELECT
-    a.AircraftRegistration,
-    COUNT(*)
-FROM silver.RefAircraft a
-GROUP BY a.AircraftRegistration
-HAVING COUNT(*) > 1 or a.AircraftRegistration IS NULL;
-GO
-
 -- Check for unwanted spaces
 -- Expectation: No results
-SELECT
-    a.AircraftRegistration
-FROM silver.RefAircraft a
-WHERE a.AircraftRegistration <> TRIM(a.AircraftRegistration);
-GO
 
-SELECT
-    a.AircraftTypeCode
-FROM silver.RefAircraft a
-WHERE a.AircraftTypeCode <> TRIM(a.AircraftTypeCode);
-GO
+WITH QualityChecks AS (
+    SELECT
+        'AircraftRegistration' AS ColumnName,
+        'Leading/Trailing Spaces' AS Issue,
+        COUNT(*) AS InvalidCount
+    FROM silver.RefAircraft
+    WHERE AircraftRegistration <> TRIM(AircraftRegistration)
 
-SELECT
-    a.Manufacturer
-FROM silver.RefAircraft a
-WHERE a.Manufacturer <> TRIM(a.Manufacturer);
-GO
+    UNION ALL
 
-SELECT
-    a.Model
-FROM silver.RefAircraft a
-WHERE a.Model <> TRIM(a.Model);
-GO
+    SELECT
+        'AircraftTypeCode',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAircraft
+    WHERE AircraftTypeCode <> TRIM(AircraftTypeCode)
 
-SELECT
-    a.OperatorCode
-FROM silver.RefAircraft a
-WHERE a.OperatorCode <> TRIM(a.OperatorCode);
-GO
+    UNION ALL
 
-SELECT
-    a.EngineType
-FROM silver.RefAircraft a
-WHERE a.EngineType <> TRIM(a.EngineType);
-GO
+    SELECT
+        'Manufacturer',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAircraft
+    WHERE Manufacturer <> TRIM(Manufacturer)
 
-SELECT
-    a.EngineCount
-FROM silver.RefAircraft a
-WHERE a.EngineCount < 0 OR a.EngineCount IS NULL;
-GO
+    UNION ALL
 
-SELECT
-    a.AircraftRegistration,
-    a.Model,
-    a.MaxSeatingCapacity
-FROM silver.RefAircraft a
-WHERE a.MaxSeatingCapacity < 0 OR a.MaxSeatingCapacity IS NULL;
-GO
+    SELECT
+        'Model',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAircraft
+    WHERE Model <> TRIM(Model)
 
-SELECT
-    a.AircraftCategory
-FROM silver.RefAircraft a
-WHERE a.AircraftCategory <> TRIM(a.AircraftCategory);
+    UNION ALL
+
+    SELECT
+        'OperatorCode',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAircraft
+    WHERE OperatorCode <> TRIM(OperatorCode)
+
+    UNION ALL
+
+    SELECT
+        'EngineType',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAircraft
+    WHERE EngineType <> TRIM(EngineType)
+
+    UNION ALL
+
+    SELECT
+        'EngineCount',
+        'Negative or NULL',
+        COUNT(*)
+    FROM silver.RefAircraft
+    WHERE EngineCount < 0
+       OR EngineCount IS NULL
+
+    UNION ALL
+
+    SELECT
+        'MaxSeatingCapacity',
+        'Negative or NULL',
+        COUNT(*)
+    FROM silver.RefAircraft
+    WHERE MaxSeatingCapacity < 0
+       OR MaxSeatingCapacity IS NULL
+
+    UNION ALL
+
+    SELECT
+        'AircraftCategory',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAircraft
+    WHERE AircraftCategory <> TRIM(AircraftCategory)
+)
+SELECT *
+FROM QualityChecks
+WHERE InvalidCount > 0
+ORDER BY ColumnName;
 GO
 
 -- ====================================================================
 -- Checking 'silver.RefAirport'
 -- ====================================================================
--- Check for NULLs or Duplicates in Primary Key
--- Expectation: No Results
-
-SELECT
-    a.AirportCode,
-    COUNT(*)
-FROM silver.RefAirport a
-GROUP BY a.AirportCode
-HAVING COUNT(*) > 1 OR a.AirportCode IS NULL;
-GO
-
 -- Check for unwanted spaces
 -- Expectation: No results
 
-SELECT
-    a.AirportCode
-FROM silver.RefAirport a
-WHERE a.AirportCode <> TRIM(a.AirportCode);
-GO
+WITH QualityChecks AS (
+    SELECT
+        'AirportCode' AS ColumnName,
+        'Leading/Trailing Spaces' AS Issue,
+        COUNT(*) AS InvalidCount
+    FROM silver.RefAirport
+    WHERE AirportCode <> TRIM(AirportCode)
 
-SELECT
-    a.IataCode
-FROM silver.RefAirport a
-WHERE a.IataCode <> TRIM(a.IataCode);
-GO
+    UNION ALL
 
-SELECT
-    a.City
-FROM silver.RefAirport a
-WHERE a.City <> TRIM(a.City);
-GO
+    SELECT
+        'IataCode',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAirport
+    WHERE IataCode <> TRIM(IataCode)
 
-SELECT
-    a.StateProvince
-FROM silver.RefAirport a
-WHERE a.StateProvince <> TRIM(a.StateProvince);
-GO
+    UNION ALL
 
-SELECT
-    a.Country
-FROM silver.RefAirport a
-WHERE a.Country <> TRIM(a.Country) OR a.Country IS NULL;
-GO
+    SELECT
+        'City',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAirport
+    WHERE City <> TRIM(City)
 
-SELECT
-    a.Region
-FROM silver.RefAirport a
-WHERE a.Region <> TRIM(a.Region);
-GO
+    UNION ALL
 
-SELECT
-    a.ElevationFt
-FROM silver.RefAirport a
-WHERE a.ElevationFt < 0 OR a.ElevationFt IS NULL;
-GO
+    SELECT
+        'StateProvince',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAirport
+    WHERE StateProvince <> TRIM(StateProvince)
 
-SELECT
-    a.AirportType
-FROM silver.RefAirport a
-WHERE a.AirportType <> TRIM(a.AirportType);
+    UNION ALL
+
+    SELECT
+        'Country',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAirport
+    WHERE Country <> TRIM(Country)
+
+    UNION ALL
+
+    SELECT
+        'Region',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAirport
+    WHERE Region <> TRIM(Region)
+
+    UNION ALL
+
+    SELECT
+        'ElevationFt',
+        'Negative or NULL',
+        COUNT(*)
+    FROM silver.RefAirport
+    WHERE ElevationFt < 0
+       OR ElevationFt IS NULL
+
+    UNION ALL
+
+    SELECT
+        'AirportType',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefAirport
+    WHERE AirportType <> TRIM(AirportType)
+)
+SELECT *
+FROM QualityChecks
+WHERE InvalidCount > 0
+ORDER BY ColumnName;
 GO
 
 -- ====================================================================
 -- Checking 'silver.RefOperator'
 -- ====================================================================
--- Check for NULLs or Duplicates in Primary Key
--- Expectation: No Results
-
-SELECT
-    o.OperatorCode,
-    COUNT(*)
-FROM silver.RefOperator o
-GROUP BY o.OperatorCode
-HAVING COUNT(*) > 1 OR o.OperatorCode IS NULL;
-GO
-
 -- Check for unwanted spaces
 -- Expectation: No results
-SELECT
-    o.OperatorCode
-FROM silver.RefOperator o
-WHERE o.OperatorCode <> TRIM(o.OperatorCode);
-GO
+WITH QualityChecks AS (
+    SELECT
+        'OperatorCode' AS ColumnName,
+        'Leading/Trailing Spaces' AS Issue,
+        COUNT(*) AS InvalidCount
+    FROM silver.RefOperator
+    WHERE OperatorCode <> TRIM(OperatorCode)
 
-SELECT
-    o.OperatorName
-FROM silver.RefOperator o
-WHERE o.OperatorName <> TRIM(o.OperatorName);
-GO
+    UNION ALL
 
-SELECT
-    o.OperatorType
-FROM silver.RefOperator o
-WHERE o.OperatorType <> TRIM(o.OperatorType);
-GO
+    SELECT
+        'OperatorName',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefOperator
+    WHERE OperatorName <> TRIM(OperatorName)
 
-SELECT
-    o.Country
-FROM silver.RefOperator o
-WHERE o.Country <> TRIM(o.Country);
-GO
+    UNION ALL
 
-SELECT 
-    o.FoundedYear    
-FROM silver.RefOperator o
-WHERE o.FoundedYear < 0 OR o.FoundedYear IS NULL;
-GO
+    SELECT
+        'OperatorType',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefOperator
+    WHERE OperatorType <> TRIM(OperatorType)
 
-SELECT
-    o.Alliance
-FROM silver.RefOperator o
-WHERE o.Alliance <> TRIM(o.Alliance);
+    UNION ALL
+
+    SELECT
+        'Country',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefOperator
+    WHERE Country <> TRIM(Country)
+
+    UNION ALL
+
+    SELECT
+        'FoundedYear',
+        'Negative or NULL',
+        COUNT(*)
+    FROM silver.RefOperator
+    WHERE FoundedYear < 0
+       OR FoundedYear IS NULL
+
+    UNION ALL
+
+    SELECT
+        'Alliance',
+        'Leading/Trailing Spaces',
+        COUNT(*)
+    FROM silver.RefOperator
+    WHERE Alliance <> TRIM(Alliance)
+)
+SELECT *
+FROM QualityChecks
+WHERE InvalidCount > 0
+ORDER BY ColumnName;
 GO
